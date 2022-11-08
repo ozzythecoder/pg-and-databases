@@ -4,7 +4,7 @@ const router = express.Router();
 const pg = require('pg');
 const Pool = pg.Pool;
 const pool = new Pool({
-  database: 'songs', // name of database
+  database: 'music_library', // name of database
   host: 'localhost', // database server
   port: 5432, // Postgres default
   max: 10, // max queries at once
@@ -21,33 +21,43 @@ pool.on('error', (error) => {
 })
 
 let songs = [
-    {
-        rank: 355, 
-        artist: 'Ke$ha', 
-        track: 'Tik-Toc', 
-        published: '1/1/2009'
-    },
-    {
-        rank: 356, 
-        artist: 'Gene Autry', 
-        track: 'Rudolph, the Red-Nosed Reindeer', 
-        published: '1/1/1949'
-    },
-    {
-        rank: 357, 
-        artist: 'Oasis', 
-        track: 'Wonderwall', 
-        published: '1/1/1996'
-    }
+  {
+    rank: 355,
+    artist: 'Ke$ha',
+    track: 'Tik-Toc',
+    published: '1/1/2009'
+  },
+  {
+    rank: 356,
+    artist: 'Gene Autry',
+    track: 'Rudolph, the Red-Nosed Reindeer',
+    published: '1/1/1949'
+  },
+  {
+    rank: 357,
+    artist: 'Oasis',
+    track: 'Wonderwall',
+    published: '1/1/1996'
+  }
 ];
 
 router.get('/', (req, res) => {
-    res.send(songs);
+
+  let queryText = 'SELECT * FROM songs;';
+
+  pool.query(queryText)
+    .then((result) => {
+      res.send(result.rows);
+    })
+    .catch((error) => {
+      console.log(`Error making query ${queryText}: ${error}`);
+    })
+
 });
 
 router.post('/', (req, res) => {
-    songs.push(req.body);
-    res.sendStatus(200);
+  songs.push(req.body);
+  res.sendStatus(200);
 });
 
 module.exports = router;
